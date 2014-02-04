@@ -74,6 +74,21 @@ if (defined('ENVIRONMENT'))
  */
 	$application_folder = 'application';
 
+	$available_applications = glob($application_folder . '/*', GLOB_ONLYDIR);
+	foreach ($available_applications as $v) {
+		if (file_exists($v . '/ci.json')) {
+			$application_config = json_decode(@file_get_contents($v . '/ci.json'));
+			if ($application_config !== null) {
+				if (array_key_exists('fqdn', $application_config)) {
+					if (strtolower($_SERVER['HTTP_HOST']) === strtolower($application_config['fqdn'])) {
+						$application_folder = $v;
+						break;
+					}
+				}
+			}
+		}
+	}
+
 /*
  * --------------------------------------------------------------------
  * DEFAULT CONTROLLER
